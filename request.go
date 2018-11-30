@@ -22,6 +22,7 @@ type Request struct {
 	Header Header
 	Query  Query
 	Body   interface{}
+	url    *url.URL
 }
 
 func (m *Request) GetRequest() (*Request, bool) {
@@ -112,17 +113,25 @@ func (m *Request) makeQuery(values url.Values) string {
 
 }
 
-func (m *Request) Url() string {
+func (m *Request) Url() *url.URL {
 
-	u, err := url.Parse(m.URL)
+	var (
+		err error
+	)
+
+	if m.url != nil {
+		return m.url
+	}
+
+	m.url, err = url.Parse(m.URL)
 
 	if err != nil {
 		panic(err.Error())
 	}
 
-	u.RawQuery = m.makeQuery(u.Query())
+	m.url.RawQuery = m.makeQuery(m.url.Query())
 
-	return u.String()
+	return m.url
 }
 
 func (m *Request) Do(c *Client) (rep *Response, err error) {
@@ -149,7 +158,7 @@ func (m *Request) Do(c *Client) (rep *Response, err error) {
 
 	ask, err := http.NewRequest(
 		m.Method,
-		url,
+		url.String(),
 		m.getBody())
 
 	ask.Header = m.getHeaders()
