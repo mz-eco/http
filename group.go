@@ -293,3 +293,23 @@ func (m *Group) Do(names ...string) {
 	}
 
 }
+
+
+type EmptyHooker struct {
+
+}
+
+func (m *EmptyHooker) Hook(x *Group) {
+
+}
+
+type EmptyContext struct {
+
+}
+
+var (
+	EmptyGroup = &Group{
+		Hooker:&EmptyHooker{},
+		Context:(*EmptyContext)(nil),
+	}
+)
